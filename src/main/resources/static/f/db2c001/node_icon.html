@@ -1,0 +1,9 @@
+<span title="{{dmEl.doctype}}/{{dmEl.reference}}" class="w3-small"
+	data-ng-switch="dmEl.doctype"> <span data-ng-switch-default>
+		&nbsp;&nbsp;</span> <span data-ng-switch-when="14"> <i
+		class="far fa-folder"
+		data-ng-if="!(dmEl.children && dmEl.open_children)"></i> <i
+		data-ng-if="dmEl.children && dmEl.open_children"
+		class="far fa-folder-open"></i>
+</span> <i data-ng-switch-when="17" class="far fa-file"></i>
+</span>

@@ -696,13 +696,16 @@ var initDataModel = function(){
 			!ctrl.choice_data_model_obj.open_children 
 		}
 	}
-	ctrl.doc2doc_fd = {}
-	ctrl.doc2doc_fd[ctrl.doc2doc_ids[0]] = {}
-	ctrl.doc2doc_fd[ctrl.doc2doc_ids[1]] = {}
-//	console.log(ctrl.doc2doc_fd)
-	
-	read_to_folder({doc_id:ctrl.doc2doc_ids[0]}, ctrl.doc2doc_ids[0])
-	read_to_folder({doc_id:ctrl.doc2doc_ids[1]}, ctrl.doc2doc_ids[1])
+
+	if(ctrl.doc2doc_ids){
+		ctrl.doc2doc_fd = {}
+		ctrl.doc2doc_fd[ctrl.doc2doc_ids[0]] = {}
+		ctrl.doc2doc_fd[ctrl.doc2doc_ids[1]] = {}
+	//	console.log(ctrl.doc2doc_fd)
+		
+		read_to_folder({doc_id:ctrl.doc2doc_ids[0]}, ctrl.doc2doc_ids[0])
+		read_to_folder({doc_id:ctrl.doc2doc_ids[1]}, ctrl.doc2doc_ids[1])
+	}
 
 }
 

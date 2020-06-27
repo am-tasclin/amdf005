@@ -1,0 +1,21 @@
+<div data-ng-repeat="dmEl in dmpEl.children">
+	<div class="w3-row w3-hover-shadow"
+		data-ng-mouseover="ctrl.mouseover_item=dmEl.doc_id">
+		<div class="w3-col w3-right w3-small" style="width: 20%">
+			{{dmEl.doc_id}} <span class="w3-right"
+				data-ng-if="ctrl.mouseover_item==dmEl.doc_id"><i
+				class="fas fa-ellipsis-v w3-btn w3-padding-small"></i></span>
+		</div>
+		<div data-ng-click="ctrl.select_tree_item(dmEl)" class=" w3-rest">
+			<span data-ng-include="'node_icon.html'"></span> {{dmEl.value_1_22}}
+			<span class="w3-right w3-tiny am-b"
+				data-ng-if="dmEl.children && !dmEl.open_children"
+				class="w3-tiny am-b">[{{dmEl.children.length}}] </span>
+		</div>
+	</div>
+	<div data-ng-if="dmEl.children && dmEl.open_children"
+		class="w3-border-left w3-container">
+		<div data-ng-repeat="dmpEl in [dmEl]"
+			data-ng-include="'data_model.html'"></div>
+	</div>
+</div>
