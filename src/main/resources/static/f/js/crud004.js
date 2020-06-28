@@ -837,7 +837,7 @@ function read_element_children(doc_id, fn){
 					if(fn && fn.fn  && fn.fn.forEachOne)	fn.fn.forEachOne(v,response)
 					if(exe_fn.add_eMap) exe_fn.add_eMap(v)
 				})
-				if(fn && typeof fn === 'function')		fn(response)
+				if(fn && typeof fn === 'function')		fn(response, sql)
 			}
 			read_dataObject2fn(sql, function(response){fn0(response)})
 		}
@@ -848,7 +848,7 @@ function read_element(doc_id, fn){
 	var o = ctrl.eMap[doc_id]
 	if(!o){
 		var sql = sql_app.SELECT_obj_with_i18n(doc_id)
-		var fn0 = function(response){
+		var fn0 = function(response, sql){
 //		console.log(response.data)
 			var o = response.data.list[0]
 			//ctrl.eMap[o.doc_id] = o
@@ -858,9 +858,9 @@ function read_element(doc_id, fn){
 					ctrl.eMap[o.parent].children = [o]
 				}
 			}
-			if(fn)		fn(response)
+			if(fn)		fn(response, sql)
 		}
-		read_dataObject2fn(sql, function(response){fn0(response)})
+		read_dataObject2fn(sql, function(response){fn0(response, sql)})
 	}else{
 			if(fn)		fn()
 	}
