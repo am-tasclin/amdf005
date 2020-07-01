@@ -31,16 +31,20 @@
 				{{ctrl.eMap[ctrl.d2d_ids[0]].value_1_22}}
 			</div>
 			<div class="w3-half w3-border-left">
-				&nbsp; <i class="fas fa-ellipsis-v"></i>
+				&nbsp; <i class="fas fa-ellipsis-v">
+					{{ctrl.eMapR[ctrl.d2d_ids[0]].value_1_22}} </i>
 			</div>
 		</div>
-		<div class="w3-row" >
+		<div class="w3-row" data-ng-repeat="cc in [{mN:['eMap','eMapR']}]">
 			<div class="w3-half">
 				<div data-ng-include="'/f/db2c001/data_model.html'"
-					data-ng-repeat="dmpEl in [ctrl.eMap[ctrl.d2d_ids[0]]]"></div>
+					data-ng-repeat="c in [{dmpEl_id:ctrl.d2d_ids[0], mN:'eMap'}]"></div>
 			</div>
 			<div style="height: 83vh; overflow: auto;"
-				class="w3-half w3-border-left w3-container">a1</div>
+				class="w3-half w3-border-left w3-container">
+				<div data-ng-include="'/f/db2c001/data_model.html'"
+					data-ng-repeat="c in [{dmpEl_id:ctrl.d2d_ids[0], mN:'eMapR'}]"></div>
+			</div>
 		</div>
 	</div>
 </body>

@@ -1,12 +1,15 @@
-<div data-ng-repeat="dmEl in dmpEl.children">
+<div data-ng-repeat="dmEl in ctrl[c.mN][c.dmpEl_id].children">
 	<div class="w3-row w3-hover-shadow"
 		data-ng-mouseover="ctrl.mouseover_item=dmEl.doc_id">
 		<div class="w3-col w3-right w3-small" style="width: 20%">
-			{{dmEl.doc_id}} <span class="w3-right"
-				data-ng-if="ctrl.mouseover_item==dmEl.doc_id"><i
+			{{dmEl.doc_id}} <span
+				data-ng-if="cc.mN.indexOf(c.mN)==0 && !ctrl.eMapR[dmEl.doc_id]"
+				data-ng-click="ctrl.l2c.insert(dmEl, c)"
+				class="w3-yellow w3-btn w3-padding-small"> > </span> <span
+				class="w3-right" data-ng-if="ctrl.mouseover_item==dmEl.doc_id"><i
 				class="fas fa-ellipsis-v w3-btn w3-padding-small"></i></span>
 		</div>
-		<div data-ng-click="ctrl.select_tree_item(dmEl)" class=" w3-rest">
+		<div data-ng-click="ctrl.select_tree_item2(dmEl)" class=" w3-rest">
 			<span data-ng-include="'node_icon.html'"></span> {{dmEl.value_1_22}}
 			<span class="w3-right w3-tiny am-b"
 				data-ng-if="dmEl.children && !dmEl.open_children"
@@ -15,7 +18,7 @@
 	</div>
 	<div data-ng-if="dmEl.children && dmEl.open_children"
 		class="w3-border-left w3-container">
-		<div data-ng-repeat="dmpEl in [dmEl]"
+		<div data-ng-repeat="c in [{dmpEl_id:dmEl.doc_id, mN:c.mN}]"
 			data-ng-include="'data_model.html'"></div>
 	</div>
 </div>

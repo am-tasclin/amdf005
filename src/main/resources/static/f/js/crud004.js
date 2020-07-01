@@ -989,6 +989,14 @@ sql_app.INSERT_doc = function(so){
 		so.sql += "INSERT INTO string (string_id, value) VALUES (" +
 		so.doc_id + ", '" + so.s1value + "');\n"
 	}
+	if(so.value_1_22){
+		so.sql += "INSERT INTO string (string_id, value) VALUES (" +
+		so.doc_id + ", '" + so.value_1_22 + "');\n"
+	}
+	if(so.sort){
+		so.sql += "INSERT INTO sort (sort_id, sort) VALUES (" +
+		so.doc_id + ", " + so.sort + ");\n"
+	}
 	return so.sql
 }
 sql_app.SELECT_doc_id = function(){
