@@ -1214,3 +1214,24 @@ var initSqlExe = function($timeout){
 	}
 
 }
+
+var read2
+class Read2 {
+	constructor($http) {
+		this.http = $http
+		this.url = '/r/url_sql_read_db1'
+		this.read_element = function(a){
+			a.params.sql = sql_app.SELECT_obj_with_i18n(a.params.doc_id)
+			read2.http.get(read2.url, {params:a.params})
+			.then(function(response){
+				console.log(response.data)
+			})
+		}
+		this.sql1 = function(a){
+			read2.http.get(read2.url, {params:a.params})
+			.then(function(response){
+				a.fn(response)
+			})
+		}
+	}
+}
