@@ -8,11 +8,24 @@ app.controller('AppCtrl', function($scope, $http, $timeout) {
 
 var init_db2c001 = function($http){
 	ctrl.l2c = {}//local to central DB
+	
 	ctrl.l2c.insert = function(dmEl, c){
 		var sql = sql_app.INSERT_doc(dmEl)
 		console.log(dmEl, c, sql)
 		write_element_remote_db1(dmEl.doc_id)
 	}
+
+	ctrl.l2c.update_string = function(dmEl){
+		var data = {}
+		data.sql = sql_app.UPDATE_string(dmEl.doc_id, dmEl.value_1_22)
+		read_remote.http.post('/r/url_sql_read_remote_db1', data)
+		.then(function(response){
+			var rE = ctrl.eMapR[dmEl.doc_id]
+			var v = response.data.list1[0].value
+			rE.value_1_22 = v
+		})
+	}
+
 	ctrl.select_tree_item2 = function(dmEl){
 		ctrl.select_tree_item(dmEl)
 		console.log(dmEl.doc_id)

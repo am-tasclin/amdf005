@@ -961,6 +961,12 @@ sql_app.doc_update_sort = function(){
 	return sql
 }
 
+sql_app.UPDATE_string = function(doc_id , value){
+	var sql = "UPDATE string SET value = '"+value+"' WHERE string_id = "+doc_id+";\n"
+	sql += "SELECT * FROM string WHERE string_id = "+doc_id
+	return sql
+}
+
 sql_app.INSERT_doc = function(so){
 	if(!so.doc_id)		so.doc_id = ':nextDbId1'
 	var vars = '', vals = ''
