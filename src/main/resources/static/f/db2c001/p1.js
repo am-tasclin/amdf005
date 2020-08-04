@@ -31,6 +31,7 @@ var init_db2c001 = function($http){
 		console.log(dmEl.doc_id)
 		read_element_children_remote_db1(dmEl.doc_id)
 	}
+
 	ctrl.eMapR = {}
 	read_remote = new Read_remote($http)
 	console.log('read -> ',111)
