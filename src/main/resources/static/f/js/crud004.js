@@ -1252,31 +1252,35 @@ var initSqlExe = function ($timeout) {
 var read2
 class Read2 {
 	constructor($http) {
+
 		this.read_element = (a) => {
-			var o = ctrl.eMap[a.params.doc_id]
-			console.log(a, !o)
-			if (!o || (a.params.parent_id && o.cnt_child) ) {
-				// console.log(a.params.doc_id, a.params)
+			let o = ctrl.eMap[a.params.doc_id]
+			// console.log(a.params, !o)
+			//if not element or not element.children
+			if (!o || (a.params.parent && o.cnt_child)) {
 				if (!a.params.sql) a.params.sql = sql_app.SELECT_obj_with_i18n(a.params.doc_id)
-				read2.http.get(read2.url, { params: a.params })
+				this.http.get(this.url, { params: a.params })
 					.then((response) => {
 						angular.forEach(response.data.list, (o) => {
 							ctrl.eMap[o.doc_id] = o
-							console.log(o.doc_id)
-							if (a.fnForEach) {
+							if (a.fnForEach){
 								a.fnForEach(o, response)
-							}
+							} 
 						})
-						if (a.fnForAll)
-							a.fnForAll(response)
+						if (a.fnForAll) a.fnForAll(response)
 					})
+			} else {
+				// console.log('-------------------1271', o, a)
+				if (a.fnForEach) a.fnForEach(o)
 			}
 		}
+
 		this.sql1 = (a) =>
-			read2.http.get(read2.url, { params: a.params })
-				.then((response) => a.fn(response))
+			this.http.get(this.url, { params: a.params })
+				.then((response) => a.fnThen(response))
 
 		this.http = $http
 		this.url = '/r/url_sql_read_db1'
 	}
 }
+

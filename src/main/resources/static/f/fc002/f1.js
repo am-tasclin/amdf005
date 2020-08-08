@@ -1,6 +1,5 @@
 app.controller('AppCtrl', class {
     constructor($scope, $http, $timeout) {
-        console.log(123)
         ctrl = this
         initApp($scope, $http, $timeout)
         read2 = new Read2($http)
@@ -13,7 +12,10 @@ app.controller('AppCtrl', class {
             )
         )
         // 371905 371903
-        read2.elReadDocRJ({doc_id:371903})
+        read2.elReadDocRJ({ doc_id: 371903, rJ: { iteration: 0 } })
+        $timeout(() => {
+            ctrl.rJStr = JSON.stringify({ 'PlanDefinition': ctrl.rJ }, undefined, 2)
+        }, 400)
     }
 })
 
@@ -21,27 +23,27 @@ createRightJSON = (rJ, data, $timeout) => {
     var key = extractKey(data)
     rJ[key] = data.value_1_22
     rJ.doc_id = data.doc_id
-    console.log(rJ, data)
     angular.forEach(data.children, (d) => {
         var k2 = extractKey(d)
-        console.log(k2, d, ctrl.eMap[d.reference].doctype, 11)
         if (37 == ctrl.eMap[d.reference].doctype) {
             rJ[k2] = []
             addListRJ(rJ, d, k2)
         }
         // createRightJSON(rJ, d)
     })
-    $timeout(() =>
-        ctrl.pfNiceStr = JSON.stringify({ 'PlanDefinition': rJ }, undefined, 2), 200)
+    // console.log(rJ, '-------------------------36')
+    ctrl.rJ1 = rJ
+    $timeout(() => {
+        ctrl.pfNiceStr = JSON.stringify({ 'PlanDefinition': ctrl.rJ1 }, undefined, 2)
+    }, 300)
 }
 
 initBuildHRJ = () => {
     exe_fn.buildHRJ = {}
     exe_fn.buildHRJ.ActivityDefinition = (d2) => {
         // [371927] instantiatesCanonical ActivityDefinition:368817 
-        console.log(111)
         read2.sql1({
-            fn: (response) => {
+            fnThen: (response) => {
                 var task_id = response.data.list[0].parent
                 console.log(task_id)
             }, params: {
@@ -50,36 +52,59 @@ initBuildHRJ = () => {
         })
     }
     read2.elReadDocRJ = (params) => {
-        console.log(params)
-        if (!ctrl.rJ) ctrl.rJ = { iteration: 0 }
-        if (!ctrl.rJ[params.doc_id]) ctrl.rJ[params.doc_id] = {}
-        ctrl.rJ.iteration++
-        console.log(ctrl.rJ.iteration, ctrl.rJ, params)
-        if (ctrl.rJ.iteration > 3) {
-            console.log(ctrl.rJ)
+        if (!ctrl.rJ) ctrl.rJ = params.rJ
+        console.log('params = ', params.doc_id, params.parent, ctrl.rJ)
+        // if (!ctrl.rJ[params.doc_id]) ctrl.rJ[params.doc_id] = {}
+        if (++ctrl.rJ.iteration > 4) {
+            console.log('END::', ctrl.rJ.iteration)
             return
         }
-        read2.read_element({//data
+        read2.read_element({ //data
             params: params
-            , fnForEach: (o, response) => {
-                console.log(o.doc_id)
-                var data = ctrl.eMap[params.doc_id]
-                var reference = data.reference
-                console.log(data, ctrl.rJ, reference, data.value_1_22)
-                if (o.cnt_child)
-                    read2.elReadDocRJ({doc_id:o.doc_id, parent:o.doc_id
-                        , sql:sql_app.SELECT_children_with_i18n()})
-                read2.read_element({//metadata
-                    params: { doc_id: reference }
-                    , fnForEach: (response2) => {
-                        var key = extractKey(data)
-                        ctrl.rJ[params.doc_id][key] = data.value_1_22
-                        ctrl.rJ[params.doc_id].doc_id = params.doc_id
-                        console.log(key, ctrl.eMap[reference], ctrl.rJ[params.doc_id])
+            , fnForEach: (o, response) => {// forEach data Object
+                let fnForEach = () => {
+                    let key = extractKey(o)
+                    console.log(key, o
+                        , Array.isArray(params.rJ), params.rJ)
+                    // params.rJ[key + '_id'] = o.doc_id
+                    let rJO
+                    if (Array.isArray(params.rJ)) {
+                        rJO = params.rJ.push({ doc_id: o.doc_id })
+                    } else
+                        if (ctrl.eMap[o.reference] && 37 == ctrl.eMap[o.reference].doctype) {
+                            params.rJ[key] = rJO = []
+                            // console.log(key, Array.isArray(params.rJ), params.rJ )
+                        } else if (ctrl.rJ == params.rJ) {
+                            params.rJ[key] = o.value_1_22
+                        } else if (o.cnt_child) {
+                            rJO = params.rJ[key] = {}
+                        } else {
+                            params.rJ[key] = o.value_1_22
+                        }
+                    // if (!ctrl.rJ[o.doc_id]) ctrl.rJ[o.doc_id] = {}
+                    if (o.cnt_child) {
+                        if (!rJO) rJO = params.rJ
+                        read2.elReadDocRJ({//read children
+                            doc_id: o.doc_id, parent: o.doc_id, rJ: rJO
+                            , sql: sql_app.SELECT_children_with_i18n()
+                        })
                     }
-                })
+                    // read2.elCreateRJ()
+                }
+                if (o.reference) {
+                    read2.read_element({//read metadata
+                        params: { doc_id: o.reference }
+                        , fnForEach: fnForEach
+                    })
+                } else {
+                    fnForEach()
+                }
             }
         })
+
+        read2.elCreateRJ = () => {
+            // console.log(321)
+        }
     }
 }
 
