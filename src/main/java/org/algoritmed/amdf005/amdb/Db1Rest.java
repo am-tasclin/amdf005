@@ -58,7 +58,7 @@ public class Db1Rest extends DbCommon{
 //		System.out.println(sql);
 		logger.info("\n--57-- /r/url_sql_read_db1"
 				+ " SQL = \n"+sql
-//				+ "\n" + data
+				+ "\n" + map
 				);
 		List<Map<String, Object>> list = dbParamJdbcTemplate.queryForList(sql, map);
 		map.put("list", list);
