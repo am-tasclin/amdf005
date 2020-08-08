@@ -18,8 +18,13 @@ public class DbCommon {
 		Map<String, Object> map = new HashMap<String, Object>();
 		for (String key : parameterMap.keySet()) {
 			String[] v = parameterMap.get(key);
-			String val = v[0];
-			map.put(key, val);
+			String val = v[0].trim();
+			boolean matches = val.matches("\\d+");
+			if(matches) {
+				map.put(key, Long.parseLong(val));
+			}else {
+				map.put(key, val);
+			}
 		}
 		map.remove("sql");
 		return map;
