@@ -1,3 +1,4 @@
+import('/f/fc002/f2i.js')
 app.controller('AppCtrl', class {
     constructor($scope, $http, $timeout) {
         ctrl = this
@@ -12,10 +13,20 @@ app.controller('AppCtrl', class {
             )
         )
         // 371905 371903
-        read2.elReadDocRJ({ doc_id: 371903, rJ: { iteration: 0 } })
+        ctrl.rJ = { iteration: 0 }
+        read2.elReadDocRJ({ doc_id: ctrl.request.parameters.id, rJ: ctrl.rJ })
         $timeout(() => {
-            ctrl.rJStr = JSON.stringify({ 'PlanDefinition': ctrl.rJ }, undefined, 2)
-        }, 400)
+            // console.log(ctrl.rJ.doc_id, ctrl.eMap[ctrl.eMap[ctrl.rJ.doc_id].reference].parent, ctrl.eMap[ctrl.rJ.doc_id].reference2)
+            let rootName = 'PlanDefinition'
+            console.log(ctrl.rJ, ctrl.rJ.doc_id)
+            if (ctrl.eMap[ctrl.rJ.doc_id].reference && ctrl.eMap[ctrl.eMap[ctrl.rJ.doc_id].reference].parent == ctrl.eMap[ctrl.rJ.doc_id].reference2) {
+                rootName = ctrl.eMap[ctrl.rJ.doc_id].r2value
+                console.log(ctrl.eMap[ctrl.rJ.doc_id].r2value)
+            }
+            let j = {}
+            j[rootName] = ctrl.rJ
+            ctrl.rJStr = JSON.stringify(j, undefined, 2)
+        }, 1000)
     }
 })
 
@@ -52,35 +63,69 @@ initBuildHRJ = () => {
         })
     }
     read2.elReadDocRJ = (params) => {
-        if (!ctrl.rJ) ctrl.rJ = params.rJ
-        console.log('params = ', params.doc_id, params.parent, ctrl.rJ)
+        console.log('params = ', params.doc_id, params.parent)
         // if (!ctrl.rJ[params.doc_id]) ctrl.rJ[params.doc_id] = {}
-        if (++ctrl.rJ.iteration > 4) {
+        if (++ctrl.rJ.iteration > 14) {
             console.log('END::', ctrl.rJ.iteration)
             return
         }
         read2.read_element({ //data
             params: params
             , fnForEach: (o, response) => {// forEach data Object
+                let readRefRef2 = (rJO) => {
+                    // [371927] instantiatesCanonical ActivityDefinition:368817
+                    if (368817 == o.reference2) {//ActivityDefinition
+                        read2.sql1({
+                            fnThen: (response) => {
+                                angular.forEach(response.data.list, (d) => {
+                                    rJO.Task = []
+                                    read2.elReadDocRJ({ doc_id: d.parent, rJ: rJO.Task })
+                                })
+                            }, params: {
+                                r: 371927, r2: o.doc_id,
+                                sql: "SELECT * FROM doc WHERE reference=:r AND reference2 = :r2"
+                            }
+                        })
+                    }
+                }
+                let addValue_1_22 = (rJ, key, o) => {
+                    if (o.value_1_22 && key)
+                        rJ[key] = o.value_1_22
+                }
                 let fnForEach = () => {
                     let key = extractKey(o)
-                    console.log(key, o
-                        , Array.isArray(params.rJ), params.rJ)
-                    // params.rJ[key + '_id'] = o.doc_id
                     let rJO
-                    if (Array.isArray(params.rJ)) {
-                        rJO = params.rJ.push({ doc_id: o.doc_id })
-                    } else
-                        if (ctrl.eMap[o.reference] && 37 == ctrl.eMap[o.reference].doctype) {
-                            params.rJ[key] = rJO = []
-                            // console.log(key, Array.isArray(params.rJ), params.rJ )
-                        } else if (ctrl.rJ == params.rJ) {
-                            params.rJ[key] = o.value_1_22
-                        } else if (o.cnt_child) {
-                            rJO = params.rJ[key] = {}
+                    if (ctrl.eMap[o.parent] && 371968 == ctrl.eMap[o.parent].reference2) {//Element
+                        params.rJ[o.r1value] = o.reference2
+                    } else if (Array.isArray(params.rJ)) {//add object to list
+                        if (!o.reference && o.reference2) {
+                            rJO = {}
+                            rJO[o.r2value] = { doc_id: o.doc_id }
+                            params.rJ.push(rJO)
+                            rJO = rJO[o.r2value]
                         } else {
-                            params.rJ[key] = o.value_1_22
+                            rJO = { doc_id: o.doc_id }
+                            params.rJ.push(rJO)
                         }
+                    } else if (ctrl.eMap[o.reference] && 37 == ctrl.eMap[o.reference].doctype) {//create list
+                        params.rJ[key] = rJO = []
+                    } else if (ctrl.rJ == params.rJ) {
+                        addValue_1_22(params.rJ, key, o)
+                        params.rJ[key + '_id'] = o.doc_id
+                        if (!params.rJ.doc_id) params.rJ.doc_id = o.doc_id
+                    } else if (o.reference && ctrl.eMap[o.reference].parent == o.reference2) {//Definition root style as ActivityDefinition.name
+                        rJO = params.rJ[o.r2value] = {}
+                        addValue_1_22(rJO, key, o)
+                        rJO.doc_id = o.doc_id
+                        rJO[key + '_id'] = o.doc_id
+                        readRefRef2(rJO)
+                    } else if (o.cnt_child) {
+                        rJO = params.rJ[key] = {}
+                    } else {
+                        addValue_1_22(params.rJ, key, o)
+                        params.rJ[key + '_id'] = o.doc_id
+                        params.rJ.doc_id = o.doc_id
+                    }
                     // if (!ctrl.rJ[o.doc_id]) ctrl.rJ[o.doc_id] = {}
                     if (o.cnt_child) {
                         if (!rJO) rJO = params.rJ
@@ -89,7 +134,6 @@ initBuildHRJ = () => {
                             , sql: sql_app.SELECT_children_with_i18n()
                         })
                     }
-                    // read2.elCreateRJ()
                 }
                 if (o.reference) {
                     read2.read_element({//read metadata
@@ -97,14 +141,10 @@ initBuildHRJ = () => {
                         , fnForEach: fnForEach
                     })
                 } else {
-                    fnForEach()
+                    fnForEach(o)
                 }
             }
         })
-
-        read2.elCreateRJ = () => {
-            // console.log(321)
-        }
     }
 }
 
