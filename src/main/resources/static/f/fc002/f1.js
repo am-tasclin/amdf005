@@ -15,20 +15,27 @@ app.controller('AppCtrl', class {
         // 371905 371903
         ctrl.rJ = { iteration: 0 }
         read2.elReadDocRJ({ doc_id: ctrl.request.parameters.id, rJ: ctrl.rJ })
-        $timeout(() => {
-            // console.log(ctrl.rJ.doc_id, ctrl.eMap[ctrl.eMap[ctrl.rJ.doc_id].reference].parent, ctrl.eMap[ctrl.rJ.doc_id].reference2)
-            let rootName = 'PlanDefinition'
-            console.log(ctrl.rJ, ctrl.rJ.doc_id)
-            if (ctrl.eMap[ctrl.rJ.doc_id].reference && ctrl.eMap[ctrl.eMap[ctrl.rJ.doc_id].reference].parent == ctrl.eMap[ctrl.rJ.doc_id].reference2) {
-                rootName = ctrl.eMap[ctrl.rJ.doc_id].r2value
-                console.log(ctrl.eMap[ctrl.rJ.doc_id].r2value)
-            }
-            let j = {}
-            j[rootName] = ctrl.rJ
-            ctrl.rJStr = JSON.stringify(j, undefined, 2)
-        }, 1000)
+        angular.forEach([500, 1000], (ms) => {
+            $timeout(() => {
+                rJToStr()
+                console.log(ms)
+            }, ms)
+        })
     }
 })
+
+rJToStr = () => {
+    // console.log(ctrl.rJ.doc_id, ctrl.eMap[ctrl.eMap[ctrl.rJ.doc_id].reference].parent, ctrl.eMap[ctrl.rJ.doc_id].reference2)
+    let rootName = 'PlanDefinition'
+    console.log(ctrl.rJ, ctrl.rJ.doc_id)
+    if (ctrl.eMap[ctrl.rJ.doc_id].reference && ctrl.eMap[ctrl.eMap[ctrl.rJ.doc_id].reference].parent == ctrl.eMap[ctrl.rJ.doc_id].reference2) {
+        rootName = ctrl.eMap[ctrl.rJ.doc_id].r2value
+        console.log(ctrl.eMap[ctrl.rJ.doc_id].r2value)
+    }
+    let j = {}
+    j[rootName] = ctrl.rJ
+    ctrl.rJStr = JSON.stringify(j, undefined, 2)
+}
 
 createRightJSON = (rJ, data, $timeout) => {
     var key = extractKey(data)
@@ -65,7 +72,7 @@ initBuildHRJ = () => {
     read2.elReadDocRJ = (params) => {
         console.log('params = ', params.doc_id, params.parent)
         // if (!ctrl.rJ[params.doc_id]) ctrl.rJ[params.doc_id] = {}
-        if (++ctrl.rJ.iteration > 14) {
+        if (++ctrl.rJ.iteration > 18) {
             console.log('END::', ctrl.rJ.iteration)
             return
         }
