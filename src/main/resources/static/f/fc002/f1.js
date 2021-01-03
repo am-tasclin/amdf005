@@ -77,8 +77,7 @@ initBuildHRJ = () => {
             return
         }
         read2.read_element({ //data
-            params: params
-            , fnForEach: (o, response) => {// forEach data Object
+            params: params, fnForEach: (o, response) => {// forEach data Object
                 let readRefRef2 = (rJO) => {
                     // [371927] instantiatesCanonical ActivityDefinition:368817
                     if (368817 == o.reference2) {//ActivityDefinition
